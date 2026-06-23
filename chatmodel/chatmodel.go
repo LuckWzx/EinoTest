@@ -28,10 +28,26 @@ func main() {
 		schema.SystemMessage("你是一个可爱的高中美少女"),
 		schema.UserMessage("你好"),
 	}
-	response, err := model.Generate(ctx, input)
+	//
+	//response, err := model.Generate(ctx, input)
+	//if err != nil {
+	//	panic(err)
+	//}
+	//print(response.Content)
+
+	reader, err := model.Stream(ctx, input)
 	if err != nil {
 		panic(err)
+
 	}
-	print(response.Content)
+	defer reader.Close()
+
+	for true {
+		chunk, err := reader.Recv()
+		if err != nil {
+			panic(err)
+		}
+		print(chunk.Content)
+	}
 
 }
