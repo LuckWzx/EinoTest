@@ -2,11 +2,10 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
-	"os"
 
-	"github.com/cloudwego/eino-ext/components/embedding/ark"
+	"EinoTest/shared"
+
 	"github.com/cloudwego/eino-ext/components/indexer/milvus"
 	"github.com/cloudwego/eino/schema"
 	"github.com/joho/godotenv"
@@ -20,16 +19,10 @@ func main() {
 		panic(err)
 	}
 	//初始化客户端
-	InitClient()
+	shared.InitClient()
 	ctx := context.Background()
 
-	apiType := ark.APITypeMultiModal
-	embedder, err := ark.NewEmbedder(ctx, &ark.EmbeddingConfig{
-		APIKey:  os.Getenv("ARK_API_KEY"),
-		Model:   os.Getenv("EMBEDDER"),
-		APIType: &apiType,
-	})
-
+	embedder, err := shared.NewEmbedder(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +30,7 @@ func main() {
 	var collection = "test"
 
 	// 删除旧 collection（schema 变更后必须重建）
-	_ = MilvusCli.DropCollection(ctx, collection)
+	//_ = MilvusCli.DropCollection(ctx, collection)
 
 	var fields = []*entity.Field{
 		{
@@ -69,11 +62,11 @@ func main() {
 	}
 
 	indexer, err := milvus.NewIndexer(ctx, &milvus.IndexerConfig{
-		Client:            MilvusCli,
+		Client:            shared.MilvusCli,
 		Collection:        collection,
 		Fields:            fields,
 		Embedding:         embedder,
-		DocumentConverter: floatDocumentConverter,
+		DocumentConverter: shared.FloatDocumentConverter,
 		MetricType:        milvus.COSINE,
 	})
 	if err != nil {
@@ -96,6 +89,21 @@ func main() {
 				"author": "鹰角",
 			},
 		},
+		{
+			ID:      "3",
+			Content: "魏正想是软件学院的学生",
+			MetaData: map[string]any{
+				"author": "魏正想",
+			},
+		},
+
+		{
+			ID:      "4",
+			Content: "王者荣耀3天前刚刚更新",
+			MetaData: map[string]any{
+				"author": "想想",
+			},
+		},
 	}
 
 	ids, err := indexer.Store(ctx, docs)
@@ -104,35 +112,4 @@ func main() {
 	}
 	fmt.Println(ids)
 
-}
-
-// floatDocRow 自定义文档行结构，Vector 为 []float32 适配 FloatVector 字段
-type floatDocRow struct {
-	ID       string    `milvus:"name:id"`
-	Content  string    `milvus:"name:content"`
-	Vector   []float32 `milvus:"name:vector"`
-	Metadata []byte    `milvus:"name:metadata"`
-}
-
-func floatDocumentConverter(ctx context.Context, docs []*schema.Document, vectors [][]float64) ([]interface{}, error) {
-	rows := make([]interface{}, 0, len(docs))
-	for i, doc := range docs {
-		// float64 -> float32
-		float32Vec := make([]float32, len(vectors[i]))
-		for j, v := range vectors[i] {
-			float32Vec[j] = float32(v)
-		}
-		// metadata -> JSON bytes
-		metaBytes, err := json.Marshal(doc.MetaData)
-		if err != nil {
-			return nil, fmt.Errorf("marshal metadata: %w", err)
-		}
-		rows = append(rows, &floatDocRow{
-			ID:       doc.ID,
-			Content:  doc.Content,
-			Vector:   float32Vec,
-			Metadata: metaBytes,
-		})
-	}
-	return rows, nil
 }

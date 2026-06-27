@@ -42,7 +42,7 @@ func main() {
 	}
 	defer reader.Close()
 
-	for true {
+	for {
 		chunk, err := reader.Recv()
 		if err != nil {
 			panic(err)
