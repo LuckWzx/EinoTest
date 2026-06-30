@@ -2,4 +2,5 @@
 /volumes/
 
 *.exe
-/GoWork_10/.env
+/EinoOpenAI/.env
+/claude

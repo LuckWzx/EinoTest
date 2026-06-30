@@ -11,7 +11,7 @@ import (
 )
 
 func main() {
-	err := godotenv.Load("./GoWork_10/.env")
+	err := godotenv.Load("./EinoOpenAI/.env")
 	if err != nil {
 		panic(err)
 	}
