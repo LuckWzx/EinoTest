@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"os"
 
 	"github.com/cloudwego/eino-ext/components/embedding/ark"
@@ -39,11 +38,11 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
-	//for i, embedding := range embeddings {
-	//	//println("文本", i+1, "的向量维度：", len(embedding))
-	//	println("文本", i+1, "的向量维度：", embedding)
-	//}
-	print(embeddings)
-	fmt.Println(embeddings)
+	for i, embedding := range embeddings {
+		//println("文本", i+1, "的向量维度：", len(embedding))
+		println("文本", i+1, "的向量维度：", embedding)
+	}
+	//print(embeddings)
+	//fmt.Println(embeddings)
 
 }

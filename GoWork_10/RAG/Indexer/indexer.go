@@ -3,35 +3,35 @@ package main
 import (
 	"context"
 	"fmt"
-
-	"EinoTest/shared"
-
 	"github.com/cloudwego/eino-ext/components/indexer/milvus"
+	"github.com/cloudwego/eino-ext/libs/acl/openai"
 	"github.com/cloudwego/eino/schema"
 	"github.com/joho/godotenv"
 	"github.com/milvus-io/milvus-sdk-go/v2/entity"
+	"net/http"
+	"os"
+	"time"
 )
 
 func main() {
-
-	err := godotenv.Load(".env")
+	err := godotenv.Load("./GoWork_10/.env")
 	if err != nil {
 		panic(err)
 	}
-	//初始化客户端
-	shared.InitClient()
 	ctx := context.Background()
 
-	embedder, err := shared.NewEmbedder(ctx)
-	if err != nil {
-		panic(err)
+	httpCli := &http.Client{
+		Timeout: 60 * time.Second,
 	}
-
-	var collection = "test"
-
-	// 删除旧 collection（schema 变更后必须重建）
-	_ = shared.MilvusCli.DropCollection(ctx, collection)
-
+	embedder, err := openai.NewEmbeddingClient(ctx, &openai.EmbeddingConfig{
+		APIKey:     os.Getenv("QWEN_API_KEY"),
+		Model:      os.Getenv("QWEN_EMBED_MODEL"),
+		BaseURL:    os.Getenv("QWEN_BASE_URL"),
+		HTTPClient: httpCli,
+	})
+	InitClient()
+	defer MilvusCli.Close()
+	var collection = "wzx"
 	var fields = []*entity.Field{
 		{
 			Name:     "id",
@@ -42,10 +42,10 @@ func main() {
 			PrimaryKey: true,
 		},
 		{
-			Name:     "vector", // 确保字段名匹配
+			Name:     "vector",
 			DataType: entity.FieldTypeBinaryVector,
 			TypeParams: map[string]string{
-				"dim": "65536",
+				"dim": "32768",
 			},
 		},
 		{
@@ -62,16 +62,14 @@ func main() {
 	}
 
 	indexer, err := milvus.NewIndexer(ctx, &milvus.IndexerConfig{
-		Client:     shared.MilvusCli,
+		Client:     MilvusCli,
 		Collection: collection,
 		Fields:     fields,
 		Embedding:  embedder,
-		//MetricType: milvus.COSINE,
 	})
 	if err != nil {
 		panic(err)
 	}
-
 	docs := []*schema.Document{
 		{
 			ID:      "1",
@@ -104,11 +102,10 @@ func main() {
 			},
 		},
 	}
-
 	ids, err := indexer.Store(ctx, docs)
 	if err != nil {
 		panic(err)
 	}
-	fmt.Println(ids)
+	fmt.Print(ids)
 
 }
