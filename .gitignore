@@ -4,3 +4,4 @@
 *.exe
 /EinoOpenAI/.env
 /claude
+/.idea/vcs.xml

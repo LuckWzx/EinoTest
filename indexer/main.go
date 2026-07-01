@@ -22,7 +22,7 @@ func main() {
 	shared.InitClient()
 	ctx := context.Background()
 
-	embedder, err := shared.NewEmbedder(ctx)
+	embedder := shared.NewEmbedder(ctx)
 	if err != nil {
 		panic(err)
 	}
@@ -30,7 +30,7 @@ func main() {
 	var collection = "test"
 
 	// 删除旧 collection（schema 变更后必须重建）
-	_ = shared.MilvusCli.DropCollection(ctx, collection)
+	//_ = shared.MilvusCli.DropCollection(ctx, collection)
 
 	var fields = []*entity.Field{
 		{
@@ -66,7 +66,6 @@ func main() {
 		Collection: collection,
 		Fields:     fields,
 		Embedding:  embedder,
-		//MetricType: milvus.COSINE,
 	})
 	if err != nil {
 		panic(err)
