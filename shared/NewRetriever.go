@@ -17,7 +17,7 @@ func NewArkRetriever(ctx context.Context, embedder *ark.Embedder) *milvus.Retrie
 			"content",
 			"metadata",
 		},
-		TopK:      2, // 召回文档上限
+		TopK:      1, // 召回文档上限
 		Embedding: embedder,
 	})
 	if err != nil {
