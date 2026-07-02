@@ -5,6 +5,7 @@ import (
 	"github.com/cloudwego/eino-ext/components/document/transformer/splitter/markdown"
 	"github.com/cloudwego/eino/schema"
 	"github.com/joho/godotenv"
+	"log"
 	"os"
 )
 
@@ -51,9 +52,9 @@ func main() {
 	//transformedDocs, _ := transformer.Transform(ctx, []*schema.Document{markdownDoc})
 	transformedDocs, _ := transformer.Transform(ctx, docs)
 
-	//for idx, doc := range transformedDocs {
-	//	log.Printf("doc segment %v: %v", idx, doc.Content)
-	//}
+	for idx, doc := range transformedDocs {
+		log.Printf("doc segment %v: %v", idx, doc.Content)
+	}
 	// 处理分割结果
 	for i, doc := range transformedDocs {
 		println("片段", i+1, ":", doc.Content)
