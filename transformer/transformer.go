@@ -67,3 +67,7 @@ func main() {
 	}
 
 }
+
+//markdownDoc := &schema.Document{
+//	Content: "## Title 1\nHello Word\n## Title 2\nWord Hello",
+//}
