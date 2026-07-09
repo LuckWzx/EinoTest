@@ -17,10 +17,7 @@ func main() {
 
 func Retriever(ctx context.Context) {
 	shared.InitClient()
-	embedder, err := shared.NewEmbedder(ctx)
-	if err != nil {
-		panic(err)
-	}
+	embedder := shared.NewEmbedder(ctx)
 
 	retriever, err := milvus.NewRetriever(ctx, &milvus.RetrieverConfig{
 		Client:      shared.MilvusCli,
