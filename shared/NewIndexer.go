@@ -8,10 +8,10 @@ import (
 )
 
 func NewArkIndexer(ctx context.Context, embedder *ark.Embedder) *milvus.Indexer {
-	var collection = "test"
+	var collection = "Test"
 
 	// 删除旧 collection（schema 变更后必须重建）
-	//_ = shared.MilvusCli.DropCollection(ctx, collection)
+	_ = MilvusCli.DropCollection(ctx, collection)
 
 	var fields = []*entity.Field{
 		{

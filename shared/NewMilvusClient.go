@@ -12,8 +12,8 @@ var MilvusCli cli.Client
 func InitClient() {
 	ctx := context.Background()
 	client, err := cli.NewClient(ctx, cli.Config{
-		Address: "118.31.10.161:19530",
-		DBName:  "AwesomeEino",
+		Address: "39.105.40.22:19530",
+		DBName:  "WZXEinoFrame",
 	})
 	if err != nil {
 		panic(fmt.Errorf("failed to create milvus client: %w", err))
