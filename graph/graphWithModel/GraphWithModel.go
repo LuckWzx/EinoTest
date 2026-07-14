@@ -4,8 +4,11 @@ import (
 	"EinoTest/shared"
 	"context"
 	"fmt"
+	ccb "github.com/cloudwego/eino-ext/callbacks/cozeloop"
+	"github.com/cloudwego/eino/callbacks"
 	"github.com/cloudwego/eino/compose"
 	"github.com/cloudwego/eino/schema"
+	"github.com/coze-dev/cozeloop-go"
 	"github.com/joho/godotenv"
 	"log"
 )
@@ -16,6 +19,17 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 	ctx := context.Background()
+
+	//coze罗盘追踪
+	client, err := cozeloop.NewClient()
+	if err != nil {
+		panic(err)
+	}
+	defer client.Close(ctx)
+	// 在服务 init 时 once 调用
+	handler := ccb.NewLoopHandler(client)
+	callbacks.AppendGlobalHandlers(handler)
+
 	//注册图
 	g := compose.NewGraph[map[string]string, *schema.Message]()
 	//编写节点
